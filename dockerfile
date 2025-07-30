@@ -9,7 +9,6 @@ COPY package*.json ./
 RUN npm install
 
 COPY prisma ./prisma/
-
 RUN npx prisma generate
 
 COPY . .
@@ -28,7 +27,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci --only=production && npm cache clean --force
+RUN npm install --omit=dev && npm cache clean --force
 
 COPY prisma ./prisma/
 RUN npx prisma generate
