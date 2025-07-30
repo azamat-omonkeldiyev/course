@@ -1,0 +1,42 @@
+name: Docker Compose CI
+
+on:
+  push:
+    branches:
+      - main  # o'zingizga kerakli branchni yozing
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
+
+      - name: Build and Start containers
+        run: |
+          docker-compose -f docker-compose.yml up -d --build
+
+      - name: Wait for the app to be healthy
+        run: |
+          echo "Waiting for the container to be healthy..."
+          sleep 10  # kerak bo‘lsa bu yerda healthcheckni kutish uchun skript yozing
+
+      - name: Check running containers
+        run: docker ps -a
+
+      - name: Logs (for debugging if needed)
+        if: failure()
+        run: docker-compose logs
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose down
